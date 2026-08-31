@@ -13,6 +13,4 @@
 
 ## Link do repositório no GitHub
 
-> ⚠️ Substituir pelo link definitivo após criar e publicar o repositório no GitHub.
-
-`https://github.com/<usuario-ou-organizacao>/<nome-do-repositorio>`
+https://github.com/CaioGabriel13/arquitetura-cloud-pjbl
