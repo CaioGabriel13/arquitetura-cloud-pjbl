@@ -1,0 +1,134 @@
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.app-header p {
+  color: #888;
+  margin: 0;
+}
+
+.state-message {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.1rem;
+}
+
+.state-message.error {
+  color: #e05555;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.movie-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(127, 127, 127, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.movie-card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.movie-card-body {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.movie-card-body h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.movie-card-body p {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.rating {
+  display: inline-block;
+  font-weight: 600;
+  color: #f2b705;
+}
+
+.movie-details {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.movie-details-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.movie-details-content img {
+  width: 280px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.movie-details-content h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+}
+
+.meta {
+  color: #888;
+  margin-bottom: 0.75rem;
+}
+
+.synopsis {
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .movie-details-content {
+    flex-direction: column;
+  }
+
+  .movie-details-content img {
+    width: 100%;
+    max-width: 280px;
+  }
+}

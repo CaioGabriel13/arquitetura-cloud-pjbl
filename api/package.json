@@ -1,0 +1,15 @@
+{
+  "name": "movieshub-api",
+  "version": "1.0.0",
+  "description": "Azure Functions (Node.js v4 model) - mock backend for MovieHub PJBL",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.1"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.0.6610"
+  }
+}
