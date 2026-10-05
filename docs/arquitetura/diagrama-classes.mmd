@@ -1,0 +1,161 @@
+classDiagram
+direction TB
+
+namespace Shared {
+    class DomainError {
+        +string name
+        +string message
+    }
+    class NotFoundError {
+        <<error>>
+    }
+    class ValidationError {
+        <<error>>
+    }
+    class defineInterface {
+        <<kernel>>
+        +name: string
+        +methods: string[]
+        +isImplementedBy(candidate) boolean
+        +ensure(candidate) object
+    }
+    class AzureHttpAdapter {
+        <<adapter>>
+        +adaptAzureHttp(makeController) AzureHandler
+    }
+    class ErrorMapper {
+        <<adapter>>
+        +mapErrorToHttpResponse(error) HttpResponse
+        +registerErrorMapping(ErrorType, toResponse) void
+    }
+    class HttpResponses {
+        <<adapter>>
+        +ok(body) HttpResponse
+        +badRequest(message) HttpResponse
+        +notFound(message) HttpResponse
+        +internalError() HttpResponse
+    }
+}
+
+namespace Movies_Domain {
+    class Movie {
+        <<entity>>
+        +MovieId id
+        +string title
+        +number year
+        +string genre
+        +string director
+        +number rating
+        +string synopsis
+        +string poster
+        +create(props)$ Movie
+    }
+    class MovieId {
+        <<value object>>
+        -number value
+        +from(raw)$ MovieId
+        +equals(other) boolean
+        +toString() string
+    }
+}
+
+namespace Movies_Ports {
+    class MovieListReader {
+        <<interface>>
+        +findAll() Promise~Movie[]~
+    }
+    class MovieByIdReader {
+        <<interface>>
+        +findById(id MovieId) Promise~Movie or null~
+    }
+}
+
+namespace Slice_ListMovies {
+    class ListMoviesUseCase {
+        <<use case>>
+        -MovieListReader reader
+        +execute() Promise~Movie[]~
+    }
+    class ListMoviesController {
+        <<controller>>
+        -ListMoviesUseCase useCase
+        +handle(httpRequest) Promise~HttpResponse~
+    }
+    class MovieSummaryPresenter {
+        <<presenter>>
+        +toDto(movie)$ MovieSummaryDto
+        +toDtoList(movies)$ MovieSummaryDto[]
+    }
+    class ListMoviesFactory {
+        <<factory>>
+        +makeListMoviesController(deps) ListMoviesController
+    }
+}
+
+namespace Slice_GetMovieById {
+    class GetMovieByIdUseCase {
+        <<use case>>
+        -MovieByIdReader reader
+        +execute(input) Promise~Movie~
+    }
+    class GetMovieByIdController {
+        <<controller>>
+        -GetMovieByIdUseCase useCase
+        +handle(httpRequest) Promise~HttpResponse~
+    }
+    class MovieDetailsPresenter {
+        <<presenter>>
+        +toDto(movie)$ MovieDetailsDto
+    }
+    class GetMovieByIdFactory {
+        <<factory>>
+        +makeGetMovieByIdController(deps) GetMovieByIdController
+    }
+}
+
+namespace Movies_Infrastructure {
+    class InMemoryMovieRepository {
+        <<repository>>
+        -Movie[] movies
+        +findAll() Promise~Movie[]~
+        +findById(id MovieId) Promise~Movie or null~
+    }
+    class MoviesContainer {
+        <<composition root>>
+        +getMovieListReader() MovieListReader
+        +getMovieByIdReader() MovieByIdReader
+    }
+}
+
+DomainError <|-- NotFoundError
+DomainError <|-- ValidationError
+Movie *-- MovieId
+MovieId ..> ValidationError : lança
+
+MovieListReader ..> defineInterface : definida por
+MovieByIdReader ..> defineInterface : definida por
+InMemoryMovieRepository ..|> MovieListReader
+InMemoryMovieRepository ..|> MovieByIdReader
+InMemoryMovieRepository o-- Movie
+MoviesContainer ..> InMemoryMovieRepository : instancia
+
+ListMoviesUseCase --> MovieListReader : DIP
+ListMoviesController --> ListMoviesUseCase
+ListMoviesController ..> MovieSummaryPresenter
+ListMoviesFactory ..> ListMoviesController : cria
+ListMoviesFactory ..> MoviesContainer
+
+GetMovieByIdUseCase --> MovieByIdReader : DIP
+GetMovieByIdUseCase ..> MovieId : valida id
+GetMovieByIdUseCase ..> NotFoundError : lança
+GetMovieByIdController --> GetMovieByIdUseCase
+GetMovieByIdController ..> MovieDetailsPresenter
+GetMovieByIdFactory ..> GetMovieByIdController : cria
+GetMovieByIdFactory ..> MoviesContainer
+
+MovieSummaryPresenter ..> Movie
+MovieDetailsPresenter ..> Movie
+ListMoviesController ..> HttpResponses
+GetMovieByIdController ..> HttpResponses
+AzureHttpAdapter ..> ErrorMapper
+ErrorMapper ..> DomainError

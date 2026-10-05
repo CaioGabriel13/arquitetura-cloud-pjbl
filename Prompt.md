@@ -47,3 +47,43 @@ e se utilizou o Apidog para mock, informar os endereços.
 ## Observação
 
 Os prompts acima foram utilizados de forma iterativa em uma sessão de chat com o Claude Code, que gerou o código-fonte completo (frontend, API e arquivos de configuração). O código gerado foi revisado, testado localmente (build do frontend e execução da API com Azure Functions Core Tools) e ajustado pelo grupo antes da publicação.
+
+---
+
+# TDE — Vertical Slice + Clean Architecture + SOLID no backend
+
+Refatoração do backend (`api/`) feita com apoio do **Claude Code** (Anthropic, modelo configurado `claude-opus-5-5`)
+na branch `refactor/vertical-slice-clean-architecture`.
+
+## Prompt 1 — enunciado (prompt principal)
+
+```
+Utilizar IA Generativa para aplicar o VERTICAL SLICE e CLEAN ARCHITECTURE e SOLID no backend da aplicação TDE 2.
+Utilizar o código da aplicação que está sendo criada no TDE 2.
+
+Em documento PDF entregar:
+
+No arquivo deve constar o nome dos ALUNOS que auxiliou na tarefa, independente de ser atividade em grupo. (Descreva o que cada aluno realizou).
+Informar o GITHUB do projeto em uma nova branch.
+Informar todos os prompts utilizados para modificar a aplicação.
+Entregar diagrama de classes e componentes do BACKEND da aplicação em VERTICAL SLICE e CLEAN ARCHITECTURE e SOLID (gerar em markdown e imagem).
+
+https://github.com/CaioGabriel13/arquitetura-cloud-pjbl.git
+
+no documento deixe em evidencia como foi estruturado os 3 principios.
+```
+
+## Prompt 2 — resposta à pergunta da IA sobre a divisão de tarefas
+
+A IA perguntou como preencher a descrição do que cada aluno realizou. Resposta enviada:
+
+```
+Sugira uma divisão
+```
+
+## Resultado
+
+- Backend reorganizado em `api/src/modules/movies/features/` (uma pasta por funcionalidade = Vertical Slice).
+- Camadas Domain / Application (ports) / Interface Adapters / Frameworks & Drivers (Clean Architecture).
+- SOLID aplicado em cada classe (detalhes no PDF de entrega e em [docs/arquitetura/README.md](docs/arquitetura/README.md)).
+- 17 testes automatizados (`cd api && npm test`), incluindo teste de paridade do contrato HTTP consumido pelo frontend.

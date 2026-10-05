@@ -1,4 +1,4 @@
-const movies = [
+const moviesSeed = [
   {
     id: 1,
     title: "Interestelar",
@@ -67,4 +67,4 @@ const movies = [
   }
 ];
 
-module.exports = { movies };
+module.exports = { moviesSeed };

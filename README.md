@@ -6,7 +6,7 @@ Catálogo de filmes com frontend em **React (Vite)** consumindo uma API mock em 
 
 - **Site publicado (Azure Static Web Apps):** `<preencher após o deploy — ex: https://moviehub-xxxxx.azurestaticapps.net>`
 - **API (Azure Functions, integrada ao Static Web Apps):** `<mesma URL acima>/api/movies`
-- **Mock Apidog:** não utilizado neste projeto — os dados mockados estão embutidos diretamente na Azure Function ([api/src/data/movies.js](api/src/data/movies.js)).
+- **Mock Apidog:** não utilizado neste projeto — os dados mockados estão no repositório em memória do backend ([api/src/modules/movies/infrastructure/persistence/moviesSeed.js](api/src/modules/movies/infrastructure/persistence/moviesSeed.js)).
 
 ## Funcionalidades / Telas
 
@@ -18,7 +18,8 @@ Catálogo de filmes com frontend em **React (Vite)** consumindo uma API mock em 
 ```
 .
 ├── frontend/     # React + Vite (SPA com React Router)
-├── api/          # Azure Functions (Node.js, modelo de programação v4)
+├── api/          # Azure Functions (Node.js v4) — Vertical Slice + Clean Architecture + SOLID
+├── docs/arquitetura/  # Diagramas de classes e componentes do backend (Mermaid + PNG/SVG)
 ├── GRUPO.md      # Integrantes do grupo
 ├── Prompt.md     # Prompts de IAG utilizados para gerar o projeto
 └── README.md
@@ -40,6 +41,19 @@ Endpoints disponíveis:
 
 - `GET http://localhost:7071/api/movies`
 - `GET http://localhost:7071/api/movies/{id}`
+
+Testes do backend (unitários + integração, sem dependências extras):
+
+```bash
+cd api
+npm test
+```
+
+### Arquitetura do backend
+
+A API foi reorganizada em **Vertical Slices** (`api/src/modules/movies/features/<funcionalidade>`),
+com as camadas da **Clean Architecture** (Domain → Application → Interface Adapters → Frameworks)
+e os princípios **SOLID**. Detalhes e diagramas em [docs/arquitetura/README.md](docs/arquitetura/README.md).
 
 ### 2. Frontend (React)
 

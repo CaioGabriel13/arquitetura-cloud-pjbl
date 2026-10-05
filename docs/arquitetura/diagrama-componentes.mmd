@@ -1,0 +1,76 @@
+flowchart TB
+    FE["React SPA (frontend)"]:::ext
+    RT["Azure Functions Runtime · Azure Static Web Apps<br/>src/index.js «entry point»"]:::fw
+
+    subgraph S1["«component» Vertical Slice · list-movies"]
+        direction TB
+        F1["listMovies.function «Azure Function»"]:::fw
+        FA1["listMovies.factory «DI»"]:::fw
+        C1["ListMoviesController"]:::ad
+        P1["MovieSummaryPresenter"]:::ad
+        U1["ListMoviesUseCase"]:::app
+        F1 --> FA1 --> C1 --> P1
+        C1 --> U1
+    end
+
+    subgraph S2["«component» Vertical Slice · get-movie-by-id"]
+        direction TB
+        F2["getMovieById.function «Azure Function»"]:::fw
+        FA2["getMovieById.factory «DI»"]:::fw
+        C2["GetMovieByIdController"]:::ad
+        P2["MovieDetailsPresenter"]:::ad
+        U2["GetMovieByIdUseCase"]:::app
+        F2 --> FA2 --> C2 --> P2
+        C2 --> U2
+    end
+
+    subgraph PORTS["«component» Movies · Application Ports"]
+        direction LR
+        PL(["MovieListReader «interface»"]):::app
+        PB(["MovieByIdReader «interface»"]):::app
+    end
+
+    subgraph INFRA["«component» Movies · Infrastructure"]
+        direction LR
+        CONT["movies.container «composition root»"]:::fw
+        REPO["InMemoryMovieRepository"]:::fw
+        SEED[("moviesSeed (mock)")]:::fw
+        CONT --> REPO --> SEED
+    end
+
+    subgraph DOM["«component» Movies · Domain"]
+        direction LR
+        M["Movie «entity»"]:::dom
+        MID["MovieId «value object»"]:::dom
+        M --> MID
+    end
+
+    subgraph SH["«component» Shared"]
+        direction LR
+        AD["azureHttpAdapter"]:::ad
+        EM["errorMapper"]:::ad
+        HR["httpResponses"]:::ad
+        ERR["DomainError · NotFound · Validation"]:::dom
+        DI["defineInterface «kernel»"]:::dom
+        AD --> EM --> ERR
+    end
+
+    FE -- "HTTP GET /api/movies · /api/movies/{id}" --> RT
+    RT --> S1
+    RT --> S2
+    S1 -- "requer MovieListReader" --> PORTS
+    S2 -- "requer MovieByIdReader" --> PORTS
+    INFRA -. "implementa (provê)" .-> PORTS
+    S1 -- "usa factory" --> INFRA
+    S2 -- "usa factory" --> INFRA
+    PORTS --> DOM
+    INFRA --> DOM
+    S1 --> SH
+    S2 --> SH
+    DOM --> SH
+
+    classDef dom fill:#FFF4C2,stroke:#B8900B,color:#3D3000
+    classDef app fill:#FADBD8,stroke:#B03A2E,color:#4A0F09
+    classDef ad fill:#D5F5E3,stroke:#1E8449,color:#0B3D20
+    classDef fw fill:#D6EAF8,stroke:#1F618D,color:#0B2A40
+    classDef ext fill:#EEEEEE,stroke:#666,color:#222
