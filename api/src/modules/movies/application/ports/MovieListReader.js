@@ -1,4 +1,4 @@
-const { defineInterface } = require("../../../../shared/kernel/defineInterface");
+import { defineInterface } from "../../../../shared/kernel/defineInterface.js";
 
 /**
  * Porta de saída (ISP): leitura da lista completa de filmes.
@@ -6,8 +6,7 @@ const { defineInterface } = require("../../../../shared/kernel/defineInterface")
  * Contrato (LSP — toda implementação deve respeitá-lo):
  *   findAll(): Promise<Movie[]>   // nunca null; lista vazia se não houver filmes
  *
+ * Implementada pelo HttpMovieCatalogGateway (chama o microsserviço movies-catalog).
  * Usada apenas pela slice "list-movies".
  */
-const MovieListReader = defineInterface("MovieListReader", ["findAll"]);
-
-module.exports = { MovieListReader };
+export const MovieListReader = defineInterface("MovieListReader", ["findAll"]);

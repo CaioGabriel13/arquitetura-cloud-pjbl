@@ -1,24 +1,24 @@
-const { NotFoundError, ValidationError } = require("../domain/errors");
-const { badRequest, notFound, internalError } = require("./httpResponses");
+import { NotFoundError, ValidationError } from "../domain/errors/index.js";
+import { UpstreamServiceError } from "../application/errors/UpstreamServiceError.js";
+import { badGateway, badRequest, internalError, notFound } from "./httpResponses.js";
 
 /**
- * Tabela de mapeamento Erro de domínio -> resposta HTTP.
+ * Tabela de mapeamento Erro -> resposta HTTP (Interface Adapters).
  *
  * OCP: para suportar um novo tipo de erro basta registrar uma nova entrada
  * (registerErrorMapping) — nenhum controller ou caso de uso é alterado.
  */
 const mappings = [
   [NotFoundError, (error) => notFound(error.message)],
-  [ValidationError, (error) => badRequest(error.message)]
+  [ValidationError, (error) => badRequest(error.message)],
+  [UpstreamServiceError, () => badGateway()]
 ];
 
-function registerErrorMapping(ErrorType, toResponse) {
+export function registerErrorMapping(ErrorType, toResponse) {
   mappings.unshift([ErrorType, toResponse]);
 }
 
-function mapErrorToHttpResponse(error) {
+export function mapErrorToHttpResponse(error) {
   const match = mappings.find(([ErrorType]) => error instanceof ErrorType);
   return match ? match[1](error) : internalError();
 }
-
-module.exports = { mapErrorToHttpResponse, registerErrorMapping };

@@ -1,6 +1,4 @@
-const { DomainError } = require("./DomainError");
+import { DomainError } from "./DomainError.js";
 
 /** Recurso solicitado não existe. */
-class NotFoundError extends DomainError {}
-
-module.exports = { NotFoundError };
+export class NotFoundError extends DomainError {}

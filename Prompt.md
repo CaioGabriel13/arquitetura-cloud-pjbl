@@ -87,3 +87,46 @@ Sugira uma divisão
 - Camadas Domain / Application (ports) / Interface Adapters / Frameworks & Drivers (Clean Architecture).
 - SOLID aplicado em cada classe (detalhes no PDF de entrega e em [docs/arquitetura/README.md](docs/arquitetura/README.md)).
 - 17 testes automatizados (`cd api && npm test`), incluindo teste de paridade do contrato HTTP consumido pelo frontend.
+
+---
+
+# TDE — BFF + microsserviços com Vertical Slice, Clean Architecture e testes de arquitetura
+
+Feito com apoio do **Claude** (Anthropic, modelo Claude Opus 5.5, no claude.ai) na branch
+`feature/bff-microservices-archunit`.
+
+## Prompt 1 — enunciado (prompt principal)
+
+```
+https://github.com/CaioGabriel13/arquitetura-cloud-pjbl
+
+Aplicar no(s) projetos backend ( bff e microservices) o vertical slice e clean architecture.
+Aplicar testes unitários de arquitetura.
+
+Java: ArchUnit
+C#: ArchiUnit.Net
+Node: ArchiUnitTS
+Python: PyTestArch
+Enviar documento Microsoft Word / PDF, com evidências do código fonte ( github ) e print screen
+de que os testes foram executados. Informar nome dos alunos no documento.
+```
+
+## Prompt 2 — respostas às perguntas da IA
+
+A IA observou que o repositório tinha um único backend (a API em Azure Functions) e perguntou como
+tratar o "BFF e microservices" e onde publicar o código. Respostas escolhidas:
+
+- **Escopo:** "Separar em BFF + microsserviço" — a API Azure Functions vira o BFF e o catálogo vira
+  um microsserviço Node à parte, os dois em Vertical Slice + Clean Architecture com testes ArchUnitTS.
+- **GitHub:** "Vocês publicam" — a IA entrega o código pronto e o grupo faz o push da branch.
+
+## Resultado
+
+- `services/movies-catalog/`: microsserviço novo (Node.js 22, `node:http`), dono dos dados de filmes.
+- `api/`: virou BFF — o repositório em memória deu lugar ao `HttpMovieCatalogGateway`, que chama o
+  microsserviço; contrato consumido pelo frontend inalterado; 502 amigável se o catálogo cair.
+- Os dois projetos migrados para ES Modules (necessário para o ArchUnitTS ler os `import`).
+- Testes de arquitetura com **ArchUnitTS** (`npm run test:arch`) nos dois projetos, além de testes
+  unitários, de integração e um teste ponta a ponta BFF → microsserviço.
+- Documentação em [docs/arquitetura/bff-microsservicos.md](docs/arquitetura/bff-microsservicos.md) e
+  workflow de CI em [.github/workflows/backend-tests.yml](.github/workflows/backend-tests.yml).

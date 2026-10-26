@@ -1,12 +1,16 @@
 # MovieHub — PJBL Arquitetura e Soluções Cloud
 
-Catálogo de filmes com frontend em **React (Vite)** consumindo uma API mock em **Azure Functions** (Node.js), publicado no **Azure Static Web Apps**.
+Catálogo de filmes com frontend em **React (Vite)** consumindo um **BFF em Azure Functions** (Node.js), que por sua vez consulta o **microsserviço de catálogo** (`services/movies-catalog`). Frontend e BFF são publicados no **Azure Static Web Apps**.
+
+```
+React (frontend) ──/api──▶ BFF · Azure Functions (api/) ──HTTP /v1──▶ movies-catalog (services/movies-catalog/)
+```
 
 ## Endereços
 
 - **Site publicado (Azure Static Web Apps):** `<preencher após o deploy — ex: https://moviehub-xxxxx.azurestaticapps.net>`
 - **API (Azure Functions, integrada ao Static Web Apps):** `<mesma URL acima>/api/movies`
-- **Mock Apidog:** não utilizado neste projeto — os dados mockados estão no repositório em memória do backend ([api/src/modules/movies/infrastructure/persistence/moviesSeed.js](api/src/modules/movies/infrastructure/persistence/moviesSeed.js)).
+- **Mock Apidog:** não utilizado neste projeto — os dados mockados ficam no repositório em memória do microsserviço de catálogo ([services/movies-catalog/src/modules/catalog/infrastructure/persistence/moviesSeed.js](services/movies-catalog/src/modules/catalog/infrastructure/persistence/moviesSeed.js)).
 
 ## Funcionalidades / Telas
 
@@ -17,9 +21,10 @@ Catálogo de filmes com frontend em **React (Vite)** consumindo uma API mock em 
 
 ```
 .
-├── frontend/     # React + Vite (SPA com React Router)
-├── api/          # Azure Functions (Node.js v4) — Vertical Slice + Clean Architecture + SOLID
-├── docs/arquitetura/  # Diagramas de classes e componentes do backend (Mermaid + PNG/SVG)
+├── frontend/                 # React + Vite (SPA com React Router)
+├── api/                      # BFF — Azure Functions (Node.js v4) — Vertical Slice + Clean Architecture
+├── services/movies-catalog/  # Microsserviço de catálogo (Node.js) — Vertical Slice + Clean Architecture
+├── docs/arquitetura/         # Diagramas e descrição da arquitetura (Mermaid + PNG/SVG)
 ├── GRUPO.md      # Integrantes do grupo
 ├── Prompt.md     # Prompts de IAG utilizados para gerar o projeto
 └── README.md
@@ -27,9 +32,19 @@ Catálogo de filmes com frontend em **React (Vite)** consumindo uma API mock em 
 
 ##  Como rodar localmente
 
-Pré-requisitos: [Node.js 18+](https://nodejs.org) e [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (`npm i -g azure-functions-core-tools@4`).
+Pré-requisitos: [Node.js 22+](https://nodejs.org) e [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (`npm i -g azure-functions-core-tools@4`).
 
-### 1. API (Azure Functions)
+### 1. Microsserviço de catálogo
+
+```bash
+cd services/movies-catalog
+npm install
+npm start   # http://localhost:3001  (GET /v1/movies, /v1/movies/:id, /health)
+```
+
+### 2. BFF (Azure Functions)
+
+Em outro terminal:
 
 ```bash
 cd api
@@ -37,25 +52,31 @@ npm install
 npm start   # func start — sobe em http://localhost:7071
 ```
 
-Endpoints disponíveis:
+O BFF procura o microsserviço em `MOVIES_CATALOG_URL` (padrão `http://localhost:3001`).
+Veja [api/local.settings.example.json](api/local.settings.example.json).
+
+Endpoints consumidos pelo frontend (contrato inalterado):
 
 - `GET http://localhost:7071/api/movies`
 - `GET http://localhost:7071/api/movies/{id}`
 
-Testes do backend (unitários + integração, sem dependências extras):
+### Testes (unitários, integração, e2e e arquitetura)
 
 ```bash
-cd api
-npm test
+cd services/movies-catalog && npm test        # tudo
+cd services/movies-catalog && npm run test:arch   # só ArchUnitTS
+cd api && npm test                            # tudo (inclui e2e BFF -> microsserviço)
+cd api && npm run test:arch                   # só ArchUnitTS
 ```
 
 ### Arquitetura do backend
 
-A API foi reorganizada em **Vertical Slices** (`api/src/modules/movies/features/<funcionalidade>`),
-com as camadas da **Clean Architecture** (Domain → Application → Interface Adapters → Frameworks)
-e os princípios **SOLID**. Detalhes e diagramas em [docs/arquitetura/README.md](docs/arquitetura/README.md).
+BFF e microsserviço estão organizados em **Vertical Slices** (`src/modules/<módulo>/features/<funcionalidade>`),
+com as camadas da **Clean Architecture** (Domain → Application → Interface Adapters → Frameworks & Drivers).
+As regras são verificadas automaticamente por **testes de arquitetura com ArchUnitTS**.
+Detalhes, diagrama e lista de regras em [docs/arquitetura/bff-microsservicos.md](docs/arquitetura/bff-microsservicos.md).
 
-### 2. Frontend (React)
+### 3. Frontend (React)
 
 Em outro terminal:
 
@@ -78,6 +99,7 @@ O Vite já está configurado (`vite.config.js`) para fazer proxy de `/api` para 
    - **Output location:** `dist`
 3. O Azure cria automaticamente um workflow do GitHub Actions (`.github/workflows/azure-static-web-apps-*.yml`) que builda o frontend, publica a API de Azure Functions integrada e faz o deploy a cada push. O repositório já inclui um workflow equivalente em [.github/workflows/azure-static-web-apps.yml](.github/workflows/azure-static-web-apps.yml) — se optar por criar o recurso via CLI (`az staticwebapp create`) em vez do assistente do portal, basta cadastrar o token gerado como o secret `AZURE_STATIC_WEB_APPS_API_TOKEN` no GitHub (Settings → Secrets and variables → Actions).
 4. Após o primeiro deploy, copiar a URL gerada (formato `https://<nome>.azurestaticapps.net`) e atualizar a seção **Endereços** deste README.
+5. O microsserviço `services/movies-catalog` não é publicado pelo Static Web Apps. Para usar o BFF em produção, publique-o (ex.: Azure Container Apps ou App Service) e configure a variável de aplicativo `MOVIES_CATALOG_URL` do Static Web App com a URL dele. Sem isso, o BFF responde 502.
 
 ## IAG
 

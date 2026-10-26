@@ -1,21 +1,24 @@
-const { InMemoryMovieRepository } = require("./infrastructure/persistence/InMemoryMovieRepository");
-const { moviesSeed } = require("./infrastructure/persistence/moviesSeed");
+import { HttpMovieCatalogGateway } from "./infrastructure/gateways/HttpMovieCatalogGateway.js";
 
 /**
- * Composition Root do módulo "movies".
+ * Composition Root do módulo "movies" do BFF.
  *
- * Único ponto que decide QUAL implementação concreta atende às portas.
- * Para trocar o mock por um banco real, altera-se somente este arquivo
- * (as slices pedem "um MovieListReader" / "um MovieByIdReader", não uma classe).
+ * Único ponto que decide QUAL implementação concreta atende às portas e que
+ * lê a configuração do ambiente. As slices pedem "um MovieListReader" /
+ * "um MovieByIdReader", não uma classe.
+ *
+ *   MOVIES_CATALOG_URL         URL base do microsserviço (padrão: http://localhost:3001)
+ *   MOVIES_CATALOG_TIMEOUT_MS  timeout das chamadas em ms (padrão: 5000)
  */
-let repository;
+let gateway;
 
-function getMovieRepository() {
-  repository ??= new InMemoryMovieRepository(moviesSeed);
-  return repository;
+function getMovieCatalogGateway() {
+  gateway ??= new HttpMovieCatalogGateway({
+    baseUrl: process.env.MOVIES_CATALOG_URL ?? "http://localhost:3001",
+    timeoutMs: Number(process.env.MOVIES_CATALOG_TIMEOUT_MS ?? 5000)
+  });
+  return gateway;
 }
 
-module.exports = {
-  getMovieListReader: getMovieRepository,
-  getMovieByIdReader: getMovieRepository
-};
+export const getMovieListReader = getMovieCatalogGateway;
+export const getMovieByIdReader = getMovieCatalogGateway;

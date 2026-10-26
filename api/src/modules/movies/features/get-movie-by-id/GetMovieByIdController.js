@@ -1,14 +1,14 @@
-const { ok } = require("../../../../shared/http/httpResponses");
-const { MovieDetailsPresenter } = require("./MovieDetailsPresenter");
+import { ok } from "../../../../shared/http/httpResponses.js";
+import { MovieDetailsPresenter } from "./MovieDetailsPresenter.js";
 
 /**
  * Controller (Interface Adapter) — GET /api/movies/{id}.
  *
  * SRP: extrai o parâmetro de rota, chama o caso de uso e devolve o DTO.
- * Erros de domínio (ValidationError / NotFoundError) sobem para o adapter,
- * que os converte em 400 / 404 através do errorMapper.
+ * Erros (ValidationError / NotFoundError / UpstreamServiceError) sobem para
+ * o adapter, que os converte em 400 / 404 / 502 através do errorMapper.
  */
-class GetMovieByIdController {
+export class GetMovieByIdController {
   #useCase;
 
   /** @param {{ getMovieByIdUseCase: { execute(input: {id: string}): Promise<any> } }} deps */
@@ -21,5 +21,3 @@ class GetMovieByIdController {
     return ok(MovieDetailsPresenter.toDto(movie));
   }
 }
-
-module.exports = { GetMovieByIdController };

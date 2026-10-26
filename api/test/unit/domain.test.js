@@ -1,8 +1,8 @@
-const { test } = require("node:test");
-const assert = require("node:assert/strict");
-const { MovieId } = require("../../src/modules/movies/domain/MovieId");
-const { ValidationError } = require("../../src/shared/domain/errors");
-const { makeMovie } = require("../helpers/fakes");
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { MovieId } from "../../src/modules/movies/domain/MovieId.js";
+import { ValidationError } from "../../src/shared/domain/errors/index.js";
+import { makeMovie } from "../helpers/fakes.js";
 
 test("MovieId aceita inteiro positivo vindo de string", () => {
   assert.equal(MovieId.from("3").value, 3);

@@ -1,13 +1,15 @@
-const { test } = require("node:test");
-const assert = require("node:assert/strict");
-const { adaptAzureHttp } = require("../../src/shared/http/azureHttpAdapter");
-const { mapErrorToHttpResponse, registerErrorMapping } = require("../../src/shared/http/errorMapper");
-const { DomainError, NotFoundError, ValidationError } = require("../../src/shared/domain/errors");
-const { makeAzureContext } = require("../helpers/fakes");
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { adaptAzureHttp } from "../../src/shared/infrastructure/azure/azureHttpAdapter.js";
+import { mapErrorToHttpResponse, registerErrorMapping } from "../../src/shared/http/errorMapper.js";
+import { DomainError, NotFoundError, ValidationError } from "../../src/shared/domain/errors/index.js";
+import { UpstreamServiceError } from "../../src/shared/application/errors/UpstreamServiceError.js";
+import { makeAzureContext } from "../helpers/fakes.js";
 
-test("errorMapper converte erros de domínio em 404 / 400 / 500", () => {
+test("errorMapper converte erros em 404 / 400 / 502 / 500", () => {
   assert.equal(mapErrorToHttpResponse(new NotFoundError("x")).status, 404);
   assert.equal(mapErrorToHttpResponse(new ValidationError("x")).status, 400);
+  assert.equal(mapErrorToHttpResponse(new UpstreamServiceError("movies-catalog", "x")).status, 502);
   assert.equal(mapErrorToHttpResponse(new Error("boom")).status, 500);
 });
 

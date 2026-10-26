@@ -1,14 +1,14 @@
-const { ValidationError } = require("../../../shared/domain/errors");
-const { MovieId } = require("./MovieId");
+import { ValidationError } from "../../../shared/domain/errors/index.js";
+import { MovieId } from "./MovieId.js";
 
 /**
- * Entidade de domínio — Filme.
+ * Entidade de domínio do BFF — Filme, no formato que a interface exibe.
  *
  * Camada mais interna da Clean Architecture: não importa nada de
- * infraestrutura, HTTP ou Azure. Concentra apenas regras/invariantes
- * do conceito "filme".
+ * infraestrutura, HTTP ou Azure. O gateway converte o contrato do
+ * microsserviço (releaseYear, posterUrl) para esta entidade.
  */
-class Movie {
+export class Movie {
   constructor({ id, title, year, genre, director, rating, synopsis, poster }) {
     this.id = id instanceof MovieId ? id : MovieId.from(id);
     this.title = Movie.#requireText(title, "title");
@@ -46,5 +46,3 @@ class Movie {
     return value;
   }
 }
-
-module.exports = { Movie };

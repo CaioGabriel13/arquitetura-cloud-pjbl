@@ -1,5 +1,5 @@
-const { ok } = require("../../../../shared/http/httpResponses");
-const { MovieSummaryPresenter } = require("./MovieSummaryPresenter");
+import { ok } from "../../../../shared/http/httpResponses.js";
+import { MovieSummaryPresenter } from "./MovieSummaryPresenter.js";
 
 /**
  * Controller (Interface Adapter) — GET /api/movies.
@@ -7,7 +7,7 @@ const { MovieSummaryPresenter } = require("./MovieSummaryPresenter");
  * SRP: traduz requisição HTTP neutra -> caso de uso -> resposta HTTP neutra.
  * Não conhece Azure Functions nem a origem dos dados.
  */
-class ListMoviesController {
+export class ListMoviesController {
   #useCase;
 
   /** @param {{ listMoviesUseCase: { execute(): Promise<any[]> } }} deps */
@@ -20,5 +20,3 @@ class ListMoviesController {
     return ok(MovieSummaryPresenter.toDtoList(movies));
   }
 }
-
-module.exports = { ListMoviesController };

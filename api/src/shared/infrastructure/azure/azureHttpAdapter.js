@@ -1,7 +1,7 @@
-const { mapErrorToHttpResponse } = require("./errorMapper");
+import { mapErrorToHttpResponse } from "../../http/errorMapper.js";
 
 /**
- * Adapter (camada Frameworks & Drivers -> Interface Adapters).
+ * Adapter (Frameworks & Drivers -> Interface Adapters).
  *
  * Converte o HttpRequest do Azure Functions em um objeto neutro
  * ({ params, query }) e a resposta neutra do controller ({ status, body })
@@ -12,7 +12,7 @@ const { mapErrorToHttpResponse } = require("./errorMapper");
  * @param {() => { handle(req: {params: object, query: object}): Promise<{status:number, body:any}> }} makeController
  *        Fábrica do controller (composition root da slice).
  */
-function adaptAzureHttp(makeController) {
+export function adaptAzureHttp(makeController) {
   const controller = makeController();
 
   return async function azureHandler(request, context) {
@@ -34,5 +34,3 @@ function adaptAzureHttp(makeController) {
     }
   };
 }
-
-module.exports = { adaptAzureHttp };

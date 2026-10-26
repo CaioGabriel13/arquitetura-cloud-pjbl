@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
+    "MOVIES_CATALOG_URL": "http://localhost:3001",
+    "MOVIES_CATALOG_TIMEOUT_MS": "5000"
+  }
+}

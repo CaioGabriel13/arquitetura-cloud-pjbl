@@ -1,21 +1,23 @@
-/**
- * Teste de integração: registra as Azure Functions reais (src/index.js)
- * interceptando `app.http` e chama os handlers como o runtime faria.
- * Garante que o contrato consumido pelo frontend não mudou após a refatoração.
- */
-const { test, before } = require("node:test");
-const assert = require("node:assert/strict");
-const { app } = require("@azure/functions");
-const { makeAzureContext } = require("../helpers/fakes");
+// intercepta o app.http para pegar os handlers e chama eles direto,
+// usando um stub no lugar do movies-catalog
+import { test, before, after } from "node:test";
+import assert from "node:assert/strict";
+import { app } from "@azure/functions";
+import { makeAzureContext, startCatalogStub } from "../helpers/fakes.js";
 
 const registered = {};
+let catalog;
 
-before(() => {
+before(async () => {
+  catalog = await startCatalogStub();
+  process.env.MOVIES_CATALOG_URL = catalog.url;
   app.http = (name, options) => {
     registered[name] = options;
   };
-  require("../../src/index");
+  await import("../../src/index.js");
 });
+
+after(() => catalog.close());
 
 const call = (name, params = {}) =>
   registered[name].handler(
@@ -30,20 +32,23 @@ test("registra as duas functions com as mesmas rotas de antes", () => {
   assert.equal(registered.getMovieById.authLevel, "anonymous");
 });
 
-test("GET /api/movies devolve a lista resumida (sem director/synopsis)", async () => {
+test("GET /api/movies busca no microsserviço e devolve a lista resumida", async () => {
   const response = await call("getMovies");
   assert.equal(response.status, 200);
-  assert.equal(response.jsonBody.length, 6);
-  assert.deepEqual(Object.keys(response.jsonBody[0]), [
-    "id", "title", "year", "genre", "rating", "poster"
-  ]);
-  assert.equal(response.jsonBody[0].title, "Interestelar");
+  assert.deepEqual(response.jsonBody[0], {
+    id: 10,
+    title: "Filme Stub A",
+    year: 2001,
+    genre: "Drama",
+    rating: 7.1,
+    poster: "https://example.com/a.jpg"
+  });
+  assert.ok(catalog.requests.includes("GET /v1/movies"));
 });
 
-test("GET /api/movies/{id} devolve os detalhes completos", async () => {
-  const response = await call("getMovieById", { id: "3" });
+test("GET /api/movies/{id} devolve os detalhes completos no contrato do frontend", async () => {
+  const response = await call("getMovieById", { id: "20" });
   assert.equal(response.status, 200);
-  assert.equal(response.jsonBody.title, "Matrix");
   assert.deepEqual(Object.keys(response.jsonBody), [
     "id", "title", "year", "genre", "director", "rating", "synopsis", "poster"
   ]);
@@ -57,7 +62,9 @@ test("GET /api/movies/{id} inexistente devolve 404 com a mesma mensagem", async 
   });
 });
 
-test("GET /api/movies/{id} com id inválido devolve 400", async () => {
+test("GET /api/movies/{id} com id inválido devolve 400 sem chamar o microsserviço", async () => {
+  const before = catalog.requests.length;
   const response = await call("getMovieById", { id: "abc" });
   assert.equal(response.status, 400);
+  assert.equal(catalog.requests.length, before);
 });
