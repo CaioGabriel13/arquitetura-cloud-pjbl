@@ -1,16 +1,5 @@
-/**
- * Testes de arquitetura do microsserviço movies-catalog (ArchUnitTS).
- *
- * Mapa de camadas da Clean Architecture usado nas regras:
- *   Entities ............ src/modules/<m>/domain, src/shared/domain, src/shared/kernel
- *   Use Cases ........... *UseCase.js (dentro das slices) + src/modules/<m>/application (portas)
- *   Interface Adapters .. *Controller.js, *Presenter.js, src/shared/http
- *   Frameworks & Drivers  src/modules/<m>/infrastructure, src/shared/infrastructure,
- *                         *.route.js, *.factory.js, *.container.js, app.js, main.js
- *
- * Vertical Slice: cada pasta em src/modules/catalog/features/<slice> é uma
- * funcionalidade completa e não pode importar outra slice.
- */
+// Testes de arquitetura do movies-catalog com ArchUnitTS.
+// Cada pasta em src/modules/catalog/features é uma slice e não pode importar outra.
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { extractGraph, projectFiles } from "archunit";
@@ -18,7 +7,6 @@ import { TSCONFIG, escapeRegExp, expectNoViolations, listSlices } from "./archun
 
 const files = () => projectFiles(TSCONFIG);
 
-// ---- Camadas ---------------------------------------------------------------
 const DOMAIN = /^src\/(modules\/[^/]+\/domain|shared\/domain|shared\/kernel)\//;
 const OUTSIDE_DOMAIN = /^src\/(?!(modules\/[^/]+\/domain|shared\/domain|shared\/kernel)\/)/;
 const PORTS = /^src\/modules\/[^/]+\/application\//;
@@ -31,8 +19,8 @@ const INFRASTRUCTURE = /^src\/(modules\/[^/]+\/infrastructure|shared\/infrastruc
 const COMPOSITION = /(\.factory|\.route|\.container|^app|^main)\.js$/;
 const FEATURES = "src/modules/catalog/features";
 
-describe("Clean Architecture — Regra da Dependência", () => {
-  test("domínio (entidades, value objects, erros, kernel) não depende de nenhuma camada externa", async () => {
+describe("Clean Architecture - regra da dependência", () => {
+  test("domínio não depende de nenhuma camada externa", async () => {
     await expectNoViolations(
       files().inPath(DOMAIN).shouldNot().dependOnFiles().inPath(OUTSIDE_DOMAIN)
     );
@@ -45,7 +33,7 @@ describe("Clean Architecture — Regra da Dependência", () => {
   });
 
   test("casos de uso dependem somente de domínio e portas", async () => {
-    // (?!.*UseCase\.js$) ignora a aresta do próprio arquivo, que o grafo também registra
+    // o grafo inclui o próprio arquivo do use case, então ele é ignorado aqui
     const outsideDomainPortsAndUseCases = new RegExp(
       OUTSIDE_DOMAIN_AND_PORTS.source + String.raw`(?!.*UseCase\.js$)`
     );
@@ -60,7 +48,7 @@ describe("Clean Architecture — Regra da Dependência", () => {
     );
   });
 
-  test("casos de uso dependem de uma porta (abstração), nunca do repositório concreto", async () => {
+  test("casos de uso dependem da porta e não do repositório", async () => {
     await expectNoViolations(
       files()
         .withName(USE_CASE)
@@ -107,7 +95,7 @@ describe("Clean Architecture — Regra da Dependência", () => {
   });
 });
 
-describe("Vertical Slice — isolamento entre funcionalidades", () => {
+describe("Vertical Slice - isolamento entre slices", () => {
   const slices = listSlices(FEATURES);
 
   test("existem slices para isolar", () => {
@@ -173,7 +161,7 @@ describe("Saúde do grafo de dependências", () => {
     await expectNoViolations(files().inFolder("src/**").should().haveNoCycles());
   });
 
-  test("o ArchUnitTS enxergou os imports do projeto (sanidade contra falso positivo)", async () => {
+  test("ArchUnitTS conseguiu ler os imports do projeto", async () => {
     const graph = await extractGraph(TSCONFIG);
     const edges = graph.filter((edge) => edge.source !== edge.target && !edge.external);
     assert.ok(edges.length >= 30, `poucas dependências extraídas: ${edges.length}`);

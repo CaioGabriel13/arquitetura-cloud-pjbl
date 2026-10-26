@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { Movie } from "../../src/modules/movies/domain/Movie.js";
 
-/** Filme válido para testes. */
+// filme válido padrão para os testes
 export function makeMovie(overrides = {}) {
   return Movie.create({
     id: 1,
@@ -16,10 +16,7 @@ export function makeMovie(overrides = {}) {
   });
 }
 
-/**
- * Implementação fake das portas MovieListReader / MovieByIdReader.
- * Prova de LSP: substitui o HttpMovieCatalogGateway sem alterar casos de uso.
- */
+// fake das portas MovieListReader / MovieByIdReader (no lugar do gateway HTTP)
 export class FakeMovieReader {
   constructor(movies = []) {
     this.movies = movies;
@@ -37,13 +34,13 @@ export class FakeMovieReader {
   }
 }
 
-/** Contexto mínimo do Azure Functions para testes do adapter. */
+// context fake do Azure Functions
 export function makeAzureContext() {
   const logs = [];
   return { logs, log: (msg) => logs.push(msg), error: (err) => logs.push(err) };
 }
 
-/** Filmes no formato do contrato do microsserviço movies-catalog. */
+// filmes no formato que o movies-catalog devolve
 export const catalogMovies = [
   {
     id: 10,
@@ -67,10 +64,7 @@ export const catalogMovies = [
   }
 ];
 
-/**
- * Stub HTTP do microsserviço movies-catalog (contrato v1), para testar o BFF
- * de ponta a ponta sem depender do código do outro serviço.
- */
+// servidor fake que imita as rotas v1 do movies-catalog
 export async function startCatalogStub({ movies = catalogMovies, failWith } = {}) {
   const requests = [];
   const server = createServer((req, res) => {

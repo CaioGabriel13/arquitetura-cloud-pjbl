@@ -1,7 +1,4 @@
-/**
- * Teste de integração: sobe o microsserviço real (todas as slices + repositório
- * em memória) numa porta livre e chama a API por HTTP, como o BFF faz.
- */
+// sobe o servidor numa porta livre e chama a API por HTTP
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { createApp } from "../../src/app.js";

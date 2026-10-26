@@ -8,7 +8,7 @@ import { Movie } from "../../src/modules/movies/domain/Movie.js";
 import { UpstreamServiceError } from "../../src/shared/application/errors/UpstreamServiceError.js";
 import { catalogMovies } from "../helpers/fakes.js";
 
-/** fetch falso que registra as URLs chamadas e devolve respostas prontas. */
+// fetch fake que guarda as URLs chamadas
 function fakeFetch(respond) {
   const calls = [];
   const fetchImpl = async (url) => {

@@ -1,9 +1,5 @@
-/**
- * Teste de integração do BFF: registra as Azure Functions reais (src/index.js)
- * interceptando `app.http` e chama os handlers como o runtime faria. O
- * microsserviço é substituído por um stub HTTP que segue o contrato v1.
- * Garante que o contrato consumido pelo frontend não mudou.
- */
+// intercepta o app.http para pegar os handlers e chama eles direto,
+// usando um stub no lugar do movies-catalog
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { app } from "@azure/functions";

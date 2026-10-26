@@ -1,18 +1,5 @@
-/**
- * Testes de arquitetura do BFF (Azure Functions) com ArchUnitTS.
- *
- * Mapa de camadas da Clean Architecture usado nas regras:
- *   Entities ............ src/modules/<m>/domain, src/shared/domain, src/shared/kernel
- *   Use Cases ........... *UseCase.js (dentro das slices), src/modules/<m>/application (portas),
- *                         src/shared/application (erros de aplicação)
- *   Interface Adapters .. *Controller.js, *Presenter.js, src/shared/http
- *   Frameworks & Drivers  src/modules/<m>/infrastructure (gateway HTTP do microsserviço),
- *                         src/shared/infrastructure (adapter do Azure),
- *                         *.function.js, *.factory.js, *.container.js, index.js
- *
- * Vertical Slice: cada pasta em src/modules/movies/features/<slice> é uma
- * funcionalidade completa e não pode importar outra slice.
- */
+// Testes de arquitetura do BFF com ArchUnitTS.
+// Cada pasta em src/modules/movies/features é uma slice e não pode importar outra.
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { extractGraph, projectFiles } from "archunit";
@@ -20,7 +7,6 @@ import { TSCONFIG, escapeRegExp, expectNoViolations, listSlices } from "./archun
 
 const files = () => projectFiles(TSCONFIG);
 
-// ---- Camadas ---------------------------------------------------------------
 const DOMAIN = /^src\/(modules\/[^/]+\/domain|shared\/domain|shared\/kernel)\//;
 const OUTSIDE_DOMAIN = /^src\/(?!(modules\/[^/]+\/domain|shared\/domain|shared\/kernel)\/)/;
 const APPLICATION = /^src\/(modules\/[^/]+\/application|shared\/application)\//;
@@ -33,8 +19,8 @@ const INFRASTRUCTURE = /^src\/(modules\/[^/]+\/infrastructure|shared\/infrastruc
 const COMPOSITION = /(\.factory|\.function|\.container|^index)\.js$/;
 const FEATURES = "src/modules/movies/features";
 
-describe("Clean Architecture — Regra da Dependência", () => {
-  test("domínio (entidades, value objects, erros, kernel) não depende de nenhuma camada externa", async () => {
+describe("Clean Architecture - regra da dependência", () => {
+  test("domínio não depende de nenhuma camada externa", async () => {
     await expectNoViolations(
       files().inPath(DOMAIN).shouldNot().dependOnFiles().inPath(OUTSIDE_DOMAIN)
     );
@@ -47,7 +33,7 @@ describe("Clean Architecture — Regra da Dependência", () => {
   });
 
   test("casos de uso dependem somente de domínio e Application", async () => {
-    // (?!.*UseCase\.js$) ignora a aresta do próprio arquivo, que o grafo também registra
+    // o grafo inclui o próprio arquivo do use case, então ele é ignorado aqui
     const outsideInnerLayers = new RegExp(
       OUTSIDE_DOMAIN_AND_APPLICATION.source + String.raw`(?!.*UseCase\.js$)`
     );
@@ -62,7 +48,7 @@ describe("Clean Architecture — Regra da Dependência", () => {
     );
   });
 
-  test("casos de uso dependem de uma porta (abstração), nunca do gateway HTTP concreto", async () => {
+  test("casos de uso dependem da porta e não do gateway HTTP", async () => {
     await expectNoViolations(
       files()
         .withName(USE_CASE)
@@ -109,7 +95,7 @@ describe("Clean Architecture — Regra da Dependência", () => {
   });
 });
 
-describe("Vertical Slice — isolamento entre funcionalidades", () => {
+describe("Vertical Slice - isolamento entre slices", () => {
   const slices = listSlices(FEATURES);
 
   test("existem slices para isolar", () => {
@@ -135,7 +121,7 @@ describe("Vertical Slice — isolamento entre funcionalidades", () => {
   });
 });
 
-describe("BFF — papel de Backend for Frontend", () => {
+describe("BFF", () => {
   test("somente as *.function.js e o adapter do Azure importam @azure/functions", async () => {
     await expectNoViolations(
       files()
@@ -151,7 +137,7 @@ describe("BFF — papel de Backend for Frontend", () => {
     );
   });
 
-  test("o BFF não tem persistência própria: a infraestrutura do módulo só contém gateways", async () => {
+  test("infraestrutura do BFF só tem gateways (sem persistência)", async () => {
     await expectNoViolations(
       files()
         .inFolder("src/modules/*/infrastructure/**")
@@ -163,7 +149,7 @@ describe("BFF — papel de Backend for Frontend", () => {
     );
   });
 
-  test("somente os gateways acessam a rede (fetch) para falar com os microsserviços", async () => {
+  test("só os gateways usam fetch", async () => {
     await expectNoViolations(
       files()
         .inFolder("src/**")
@@ -193,7 +179,7 @@ describe("Saúde do grafo de dependências", () => {
     await expectNoViolations(files().inFolder("src/**").should().haveNoCycles());
   });
 
-  test("o ArchUnitTS enxergou os imports do projeto (sanidade contra falso positivo)", async () => {
+  test("ArchUnitTS conseguiu ler os imports do projeto", async () => {
     const graph = await extractGraph(TSCONFIG);
     const edges = graph.filter((edge) => edge.source !== edge.target && !edge.external);
     assert.ok(edges.length >= 30, `poucas dependências extraídas: ${edges.length}`);

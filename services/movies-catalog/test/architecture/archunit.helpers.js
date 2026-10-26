@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-/** tsconfig do serviço: o ArchUnitTS usa o compilador TS para ler os imports dos .js. */
+// o ArchUnitTS precisa do tsconfig para ler os imports
 export const TSCONFIG = fileURLToPath(new URL("../../tsconfig.json", import.meta.url));
 
-/** Executa a regra do ArchUnitTS e falha listando cada violação encontrada. */
+// roda a regra e mostra as violações se tiver alguma
 export async function expectNoViolations(rule) {
   const violations = await rule.check();
   assert.equal(
@@ -16,7 +16,7 @@ export async function expectNoViolations(rule) {
   );
 }
 
-/** Lista as Vertical Slices existentes (uma pasta por funcionalidade). */
+// lista as pastas de features (uma por slice)
 export function listSlices(featuresDir) {
   const url = new URL(`../../${featuresDir}/`, import.meta.url);
   return readdirSync(url, { withFileTypes: true })
@@ -24,7 +24,6 @@ export function listSlices(featuresDir) {
     .map((entry) => entry.name);
 }
 
-/** Escapa texto para uso dentro de uma RegExp. */
 export const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 function describeViolation(violation) {

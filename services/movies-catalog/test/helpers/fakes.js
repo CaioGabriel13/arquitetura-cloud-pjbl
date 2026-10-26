@@ -1,6 +1,6 @@
 import { Movie } from "../../src/modules/catalog/domain/Movie.js";
 
-/** Filme válido para testes. */
+// filme válido padrão para os testes
 export function makeMovie(overrides = {}) {
   return Movie.create({
     id: 1,
@@ -15,7 +15,7 @@ export function makeMovie(overrides = {}) {
   });
 }
 
-/** Implementação fake das portas MovieListReader / MovieByIdReader. */
+// fake das portas MovieListReader / MovieByIdReader
 export class FakeMovieReader {
   constructor(movies = []) {
     this.movies = movies;

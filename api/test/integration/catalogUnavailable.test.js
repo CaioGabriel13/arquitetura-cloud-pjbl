@@ -1,7 +1,4 @@
-/**
- * Resiliência do BFF: se o microsserviço falhar, o frontend recebe 502 com
- * mensagem amigável, e não um 500 genérico.
- */
+// se o catálogo cair, o BFF tem que devolver 502 e não 500
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { app } from "@azure/functions";

@@ -1,9 +1,4 @@
-/**
- * Teste ponta a ponta: sobe o microsserviço movies-catalog REAL como processo
- * separado (node services/movies-catalog/src/main.js) e chama as Azure
- * Functions do BFF, que falam com ele por HTTP. Prova que os dois serviços
- * conversam pelo contrato v1 sem compartilhar código.
- */
+// e2e: sobe o movies-catalog em outro processo e chama as functions do BFF
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

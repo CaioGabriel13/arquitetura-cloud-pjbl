@@ -1,7 +1,5 @@
-name: Backend — testes e arquitetura
+name: Backend - testes
 
-# Roda em qualquer branch: unitários, integração, e2e e testes de arquitetura (ArchUnitTS)
-# do BFF (api/) e do microsserviço (services/movies-catalog/).
 on:
   push:
     paths:
@@ -31,7 +29,7 @@ jobs:
         with:
           node-version: 22
 
-      # --ignore-scripts evita baixar o binário do Azure Functions Core Tools, que os testes não usam
+      # --ignore-scripts pra não baixar o Azure Functions Core Tools
       - name: Instalar dependências
         run: npm ci --ignore-scripts
 
