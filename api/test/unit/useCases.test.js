@@ -1,9 +1,9 @@
-const { test } = require("node:test");
-const assert = require("node:assert/strict");
-const { ListMoviesUseCase } = require("../../src/modules/movies/features/list-movies/ListMoviesUseCase");
-const { GetMovieByIdUseCase } = require("../../src/modules/movies/features/get-movie-by-id/GetMovieByIdUseCase");
-const { NotFoundError, ValidationError } = require("../../src/shared/domain/errors");
-const { makeMovie, FakeMovieReader } = require("../helpers/fakes");
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { ListMoviesUseCase } from "../../src/modules/movies/features/list-movies/ListMoviesUseCase.js";
+import { GetMovieByIdUseCase } from "../../src/modules/movies/features/get-movie-by-id/GetMovieByIdUseCase.js";
+import { NotFoundError, ValidationError } from "../../src/shared/domain/errors/index.js";
+import { makeMovie, FakeMovieReader } from "../helpers/fakes.js";
 
 test("ListMoviesUseCase devolve todos os filmes da porta MovieListReader", async () => {
   const reader = new FakeMovieReader([makeMovie({ id: 1 }), makeMovie({ id: 2 })]);

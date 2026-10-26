@@ -1,19 +1,25 @@
 {
   "name": "movieshub-api",
-  "version": "1.0.0",
-  "description": "Azure Functions (Node.js v4 model) - mock backend for MovieHub PJBL",
+  "version": "2.0.0",
+  "description": "BFF do MovieHub em Azure Functions (Node.js v4) — consome o microsserviço movies-catalog",
+  "type": "module",
   "main": "src/index.js",
   "scripts": {
     "start": "func start",
-    "test": "node --test test/**/*.test.js"
+    "test": "node --test --test-reporter=spec \"test/**/*.test.js\"",
+    "test:unit": "node --test --test-reporter=spec \"test/unit/*.test.js\" \"test/integration/*.test.js\"",
+    "test:e2e": "node --test --test-reporter=spec \"test/e2e/*.test.js\"",
+    "test:arch": "node --test --test-reporter=spec \"test/architecture/*.test.js\""
   },
   "dependencies": {
     "@azure/functions": "^4.5.1"
   },
   "devDependencies": {
-    "azure-functions-core-tools": "^4.0.6610"
+    "archunit": "^2.5.4",
+    "azure-functions-core-tools": "^4.0.6610",
+    "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }

@@ -1,10 +1,11 @@
-const { ValidationError } = require("../../../shared/domain/errors");
+import { ValidationError } from "../../../shared/domain/errors/index.js";
 
 /**
  * Value Object — identificador de filme.
  * Garante a invariante "id é inteiro positivo" em um único lugar (SRP).
+ * No BFF ele também evita chamar o microsserviço com um id inválido.
  */
-class MovieId {
+export class MovieId {
   #value;
 
   constructor(value) {
@@ -15,7 +16,7 @@ class MovieId {
   /** Cria um MovieId a partir de entrada externa (string ou número). */
   static from(raw) {
     const value = Number(raw);
-    if (!Number.isInteger(value) || value <= 0) {
+    if (raw === "" || raw == null || !Number.isInteger(value) || value <= 0) {
       throw new ValidationError(
         `Id de filme inválido: "${raw}". Informe um número inteiro positivo.`
       );
@@ -35,5 +36,3 @@ class MovieId {
     return String(this.#value);
   }
 }
-
-module.exports = { MovieId };

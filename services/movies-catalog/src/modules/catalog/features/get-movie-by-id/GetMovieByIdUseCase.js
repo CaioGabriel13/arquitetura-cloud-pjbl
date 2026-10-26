@@ -1,0 +1,31 @@
+import { NotFoundError } from "../../../../shared/domain/errors/index.js";
+import { MovieByIdReader } from "../../application/ports/MovieByIdReader.js";
+import { MovieId } from "../../domain/MovieId.js";
+
+/**
+ * Caso de uso (Application) — obter um filme do catálogo pelo id.
+ *
+ * Valida o id pelo Value Object e aplica a regra
+ * "filme inexistente é um erro de domínio NotFound".
+ */
+export class GetMovieByIdUseCase {
+  #reader;
+
+  constructor({ movieByIdReader }) {
+    this.#reader = MovieByIdReader.ensure(movieByIdReader);
+  }
+
+  /**
+   * @param {{ id: string | number }} input
+   * @returns {Promise<import("../../domain/Movie.js").Movie>}
+   */
+  async execute({ id }) {
+    const movieId = MovieId.from(id);
+    const movie = await this.#reader.findById(movieId);
+
+    if (!movie) {
+      throw new NotFoundError(`Filme com id ${movieId} não encontrado.`);
+    }
+    return movie;
+  }
+}

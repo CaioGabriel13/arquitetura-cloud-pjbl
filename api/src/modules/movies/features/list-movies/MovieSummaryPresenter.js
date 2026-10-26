@@ -2,10 +2,11 @@
  * Presenter (Interface Adapter) — converte a entidade Movie no DTO
  * resumido exibido no grid do frontend.
  *
- * SRP: a única razão para mudar é o formato de saída da listagem.
+ * É aqui que o BFF "recorta" o contrato para a tela: o microsserviço devolve
+ * o filme completo, mas a listagem só precisa destes campos.
  */
-class MovieSummaryPresenter {
-  /** @param {import("../../domain/Movie").Movie} movie */
+export class MovieSummaryPresenter {
+  /** @param {import("../../domain/Movie.js").Movie} movie */
   static toDto(movie) {
     return {
       id: movie.id.value,
@@ -21,5 +22,3 @@ class MovieSummaryPresenter {
     return movies.map(MovieSummaryPresenter.toDto);
   }
 }
-
-module.exports = { MovieSummaryPresenter };

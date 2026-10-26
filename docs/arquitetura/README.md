@@ -1,5 +1,10 @@
 # Arquitetura do Backend — Vertical Slice + Clean Architecture + SOLID
 
+> **Atualização (TDE BFF + microsserviços):** o backend foi dividido em um **BFF** (`api/`) e no
+> microsserviço **movies-catalog** (`services/movies-catalog/`), ambos com testes de arquitetura em
+> ArchUnitTS. A visão atual está em [bff-microsservicos.md](bff-microsservicos.md). Os diagramas
+> abaixo retratam a versão anterior, em que a API única guardava os dados em memória.
+
 Backend do **MovieHub** (Azure Functions, Node.js v4) refatorado com apoio de IA Generativa.
 Os diagramas abaixo estão em **Mermaid** (renderizam direto no GitHub) e também como imagem
 (`.png` e `.svg`) nesta mesma pasta.

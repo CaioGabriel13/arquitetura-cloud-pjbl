@@ -1,10 +1,10 @@
-const { app } = require("@azure/functions");
-const { adaptAzureHttp } = require("../../../../shared/http/azureHttpAdapter");
-const { makeGetMovieByIdController } = require("./getMovieById.factory");
+import { app } from "@azure/functions";
+import { adaptAzureHttp } from "../../../../shared/infrastructure/azure/azureHttpAdapter.js";
+import { makeGetMovieByIdController } from "./getMovieById.factory.js";
 
 /**
  * Frameworks & Drivers — registro da Azure Function da slice "get-movie-by-id".
- * Único arquivo da slice que importa `@azure/functions`.
+ * Junto com o azureHttpAdapter, é o único lugar que importa `@azure/functions`.
  */
 app.http("getMovieById", {
   methods: ["GET"],

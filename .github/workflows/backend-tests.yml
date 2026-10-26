@@ -1,0 +1,46 @@
+name: Backend — testes e arquitetura
+
+# Roda em qualquer branch: unitários, integração, e2e e testes de arquitetura (ArchUnitTS)
+# do BFF (api/) e do microsserviço (services/movies-catalog/).
+on:
+  push:
+    paths:
+      - "api/**"
+      - "services/**"
+      - ".github/workflows/backend-tests.yml"
+  pull_request:
+    paths:
+      - "api/**"
+      - "services/**"
+
+jobs:
+  test:
+    name: ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [services/movies-catalog, api]
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # --ignore-scripts evita baixar o binário do Azure Functions Core Tools, que os testes não usam
+      - name: Instalar dependências
+        run: npm ci --ignore-scripts
+
+      - name: Testes unitários e de integração
+        run: npm run test:unit
+
+      - name: Testes ponta a ponta (BFF -> microsserviço)
+        if: matrix.project == 'api'
+        run: npm run test:e2e
+
+      - name: Testes de arquitetura (ArchUnitTS)
+        run: npm run test:arch

@@ -1,6 +1,6 @@
-const { NotFoundError } = require("../../../../shared/domain/errors");
-const { MovieByIdReader } = require("../../application/ports/MovieByIdReader");
-const { MovieId } = require("../../domain/MovieId");
+import { NotFoundError } from "../../../../shared/domain/errors/index.js";
+import { MovieByIdReader } from "../../application/ports/MovieByIdReader.js";
+import { MovieId } from "../../domain/MovieId.js";
 
 /**
  * Caso de uso (Application) — obter os detalhes de um filme.
@@ -10,7 +10,7 @@ const { MovieId } = require("../../domain/MovieId");
  * DIP: depende da abstração MovieByIdReader, recebida por injeção.
  * ISP: conhece somente `findById`.
  */
-class GetMovieByIdUseCase {
+export class GetMovieByIdUseCase {
   #reader;
 
   constructor({ movieByIdReader }) {
@@ -19,7 +19,7 @@ class GetMovieByIdUseCase {
 
   /**
    * @param {{ id: string | number }} input
-   * @returns {Promise<import("../../domain/Movie").Movie>}
+   * @returns {Promise<import("../../domain/Movie.js").Movie>}
    */
   async execute({ id }) {
     const movieId = MovieId.from(id);
@@ -31,5 +31,3 @@ class GetMovieByIdUseCase {
     return movie;
   }
 }
-
-module.exports = { GetMovieByIdUseCase };

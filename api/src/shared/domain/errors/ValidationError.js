@@ -1,6 +1,4 @@
-const { DomainError } = require("./DomainError");
+import { DomainError } from "./DomainError.js";
 
 /** Dado de entrada ou invariante de domínio inválido. */
-class ValidationError extends DomainError {}
-
-module.exports = { ValidationError };
+export class ValidationError extends DomainError {}

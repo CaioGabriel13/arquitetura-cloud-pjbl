@@ -1,0 +1,21 @@
+{
+  "name": "movies-catalog-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Microsserviço de catálogo de filmes do MovieHub (Vertical Slice + Clean Architecture)",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --test --test-reporter=spec \"test/**/*.test.js\"",
+    "test:unit": "node --test --test-reporter=spec \"test/unit/*.test.js\" \"test/integration/*.test.js\"",
+    "test:arch": "node --test --test-reporter=spec \"test/architecture/*.test.js\""
+  },
+  "devDependencies": {
+    "archunit": "^2.5.4",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

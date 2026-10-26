@@ -4,8 +4,8 @@
  *
  * SRP: a única razão para mudar é o formato de saída dos detalhes.
  */
-class MovieDetailsPresenter {
-  /** @param {import("../../domain/Movie").Movie} movie */
+export class MovieDetailsPresenter {
+  /** @param {import("../../domain/Movie.js").Movie} movie */
   static toDto(movie) {
     return {
       id: movie.id.value,
@@ -19,5 +19,3 @@ class MovieDetailsPresenter {
     };
   }
 }
-
-module.exports = { MovieDetailsPresenter };

@@ -1,0 +1,67 @@
+flowchart LR
+    FE["React SPA<br/>(frontend)"]:::ext
+
+    subgraph BFF["«BFF» api/ · Azure Functions (Static Web Apps)"]
+        direction TB
+        subgraph BS1["slice list-movies"]
+            direction TB
+            BF1["listMovies.function"]:::fw
+            BC1["ListMoviesController<br/>MovieSummaryPresenter"]:::ad
+            BU1["ListMoviesUseCase"]:::app
+            BF1 --> BC1 --> BU1
+        end
+        subgraph BS2["slice get-movie-by-id"]
+            direction TB
+            BF2["getMovieById.function"]:::fw
+            BC2["GetMovieByIdController<br/>MovieDetailsPresenter"]:::ad
+            BU2["GetMovieByIdUseCase"]:::app
+            BF2 --> BC2 --> BU2
+        end
+        BP(["MovieListReader · MovieByIdReader<br/>«portas»"]):::app
+        BD["Movie · MovieId<br/>«domínio»"]:::dom
+        GW["HttpMovieCatalogGateway<br/>«gateway HTTP»"]:::fw
+        BU1 --> BP
+        BU2 --> BP
+        GW -. "implementa" .-> BP
+        BP --> BD
+        GW --> BD
+    end
+
+    subgraph MS["«microsserviço» services/movies-catalog · Node.js"]
+        direction TB
+        SRV["createHttpServer<br/>(node:http)"]:::fw
+        subgraph MS1["slice list-movies"]
+            direction TB
+            MR1["listMovies.route"]:::fw
+            MC1["ListMoviesController<br/>MovieListPresenter"]:::ad
+            MU1["ListMoviesUseCase"]:::app
+            MR1 --> MC1 --> MU1
+        end
+        subgraph MS2["slice get-movie-by-id"]
+            direction TB
+            MR2["getMovieById.route"]:::fw
+            MC2["GetMovieByIdController<br/>MoviePresenter"]:::ad
+            MU2["GetMovieByIdUseCase"]:::app
+            MR2 --> MC2 --> MU2
+        end
+        MP(["MovieListReader · MovieByIdReader<br/>«portas»"]):::app
+        MD["Movie · MovieId<br/>«domínio»"]:::dom
+        REPO["InMemoryMovieRepository<br/>+ moviesSeed"]:::fw
+        SRV --> MR1
+        SRV --> MR2
+        MU1 --> MP
+        MU2 --> MP
+        REPO -. "implementa" .-> MP
+        MP --> MD
+        REPO --> MD
+    end
+
+    FE -- "GET /api/movies<br/>GET /api/movies/{id}" --> BF1
+    FE --> BF2
+    GW -- "HTTP GET /v1/movies<br/>GET /v1/movies/:id" --> SRV
+
+    classDef dom fill:#FFF4C2,stroke:#B8900B,color:#3D3000
+    classDef app fill:#FADBD8,stroke:#B03A2E,color:#4A0F09
+    classDef ad fill:#D5F5E3,stroke:#1E8449,color:#0B3D20
+    classDef fw fill:#D6EAF8,stroke:#1F618D,color:#0B2A40
+    classDef ext fill:#EEEEEE,stroke:#666,color:#222

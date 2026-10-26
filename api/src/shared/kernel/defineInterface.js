@@ -9,7 +9,7 @@
  * @param {string} name     Nome da interface (ex.: "MovieListReader").
  * @param {string[]} methods Métodos que toda implementação deve expor.
  */
-function defineInterface(name, methods) {
+export function defineInterface(name, methods) {
   const contract = Object.freeze([...methods]);
 
   return Object.freeze({
@@ -38,5 +38,3 @@ function defineInterface(name, methods) {
     }
   });
 }
-
-module.exports = { defineInterface };
